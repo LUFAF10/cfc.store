@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Ruler } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { encodeImagePath } from "@/lib/imageUtils";
 import { getPriceForFolder, formatARS } from "@/lib/pricing";
@@ -42,9 +43,11 @@ const cardVariants = {
 function ProductCard({
   product,
   folder,
+  onFittingRoom,
 }: {
   product: Product;
   folder: string;
+  onFittingRoom: () => void;
 }) {
   const { addItem, openCart, items } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -115,9 +118,20 @@ function ProductCard({
         {/* Size selector */}
         {product.sizes.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="text-cream-bone/40 text-xs tracking-widest uppercase font-light">
-              Talle
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-cream-bone/40 text-xs tracking-widest uppercase font-light">
+                Talle
+              </p>
+              <button
+                onClick={onFittingRoom}
+                className="md:hidden flex items-center gap-1 text-cream-bone/50 hover:text-cream-bone transition-colors duration-200"
+              >
+                <Ruler size={11} strokeWidth={1.5} />
+                <span className="text-[10px] tracking-wider uppercase font-light underline underline-offset-2 decoration-cream-bone/30">
+                  Guía de talles
+                </span>
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((size) => (
                 <button
@@ -226,7 +240,7 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
         >
           {products.map((product) => (
-            <ProductCard key={product.file} product={product} folder={folder} />
+            <ProductCard key={product.file} product={product} folder={folder} onFittingRoom={onFittingRoom} />
           ))}
         </motion.div>
 
