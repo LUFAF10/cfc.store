@@ -167,36 +167,55 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
       <div className="max-w-7xl mx-auto">
 
         {/* Back + header + fitting room */}
-        <div className="relative flex items-center justify-between mb-10 md:mb-16">
-          <button
-            onClick={onBack}
-            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 min-h-[44px]"
-          >
-            ← Volver
-          </button>
+        <div className="mb-10 md:mb-16">
 
+          {/* Nav row — always visible */}
+          <div className="relative flex items-center justify-between mb-6 md:mb-0">
+            <button
+              onClick={onBack}
+              className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 min-h-[44px]"
+            >
+              ← Volver
+            </button>
+
+            {/* Desktop: title absolutely centred in this row */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease }}
+              className="hidden md:block absolute left-1/2 -translate-x-1/2 text-center pointer-events-none"
+            >
+              <h2 className="text-5xl font-black tracking-tight uppercase font-display text-cream-bone whitespace-nowrap">
+                {title}
+              </h2>
+              <p className="mt-3 text-sm tracking-widest uppercase text-cream-bone/40 font-light">
+                Piezas únicas — stock limitado
+              </p>
+            </motion.div>
+
+            <button
+              onClick={onFittingRoom}
+              className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 items-center gap-2 min-h-[44px] hidden md:flex"
+            >
+              Guía de talles →
+            </button>
+          </div>
+
+          {/* Mobile: title stacked below the nav row */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
-            className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none"
+            className="md:hidden text-center"
           >
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase font-display text-cream-bone whitespace-nowrap">
+            <h2 className="text-3xl font-black tracking-tight uppercase font-display text-cream-bone leading-tight">
               {title}
             </h2>
-            <p className="mt-1 md:mt-3 text-xs md:text-sm tracking-widest uppercase text-cream-bone/40 font-light">
+            <p className="mt-3 mb-2 text-xs tracking-widest uppercase text-cream-bone/40 font-light leading-relaxed">
               Piezas únicas — stock limitado
             </p>
           </motion.div>
 
-          <button
-            onClick={onFittingRoom}
-            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 items-center gap-2 min-h-[44px] hidden md:flex"
-          >
-            Guía de talles →
-          </button>
-          {/* Mobile spacer to balance the back button */}
-          <div className="w-[60px] md:hidden" />
         </div>
 
         {/* Grid */}
