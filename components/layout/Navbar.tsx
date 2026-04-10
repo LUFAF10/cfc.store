@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 interface NavbarProps {
+  onHome?: () => void;
   onFittingRoom?: () => void;
 }
 
-export default function Navbar({ onFittingRoom }: NavbarProps) {
+export default function Navbar({ onHome, onFittingRoom }: NavbarProps) {
   const { totalItems, openCart } = useCart();
 
   return (
@@ -16,9 +16,12 @@ export default function Navbar({ onFittingRoom }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/">
-          <span className="text-cream-bone font-extrabold text-3xl tracking-widest">CFC</span>
-        </Link>
+        <button
+          onClick={onHome}
+          className="text-cream-bone font-extrabold text-3xl tracking-widest min-h-[44px] flex items-center"
+        >
+          CFC
+        </button>
 
         {/* Right side actions */}
         <div className="flex items-center gap-4 sm:gap-6">

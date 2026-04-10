@@ -76,7 +76,7 @@ export default function Home() {
 
   return (
     <>
-      <Navbar onFittingRoom={() => setCurrentView("fitting")} />
+      <Navbar onHome={() => setCurrentView("home")} onFittingRoom={() => setCurrentView("fitting")} />
 
       <AnimatePresence mode="wait">
 
