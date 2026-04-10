@@ -90,12 +90,16 @@ function ProductCard({
     <motion.div variants={cardVariants} className="group flex flex-col">
 
       {/* Image */}
-      <div className="overflow-hidden h-[45vh] md:h-auto md:aspect-[3/4]">
+      <div className={`overflow-hidden ${folder === "CAMISETAS" ? "aspect-[3/4]" : "h-[45vh] md:h-auto md:aspect-[3/4]"}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={encodeImagePath(folder, product.file)}
           alt={`${product.team} ${product.label}`}
-          className="w-full h-full object-contain object-center md:object-cover md:object-top transition-transform duration-700 ease-out group-hover:scale-105"
+          className={`w-full h-full transition-transform duration-700 ease-out group-hover:scale-105 ${
+            folder === "CAMISETAS"
+              ? "object-cover object-top"
+              : "object-contain object-center md:object-cover md:object-top"
+          }`}
         />
       </div>
 
