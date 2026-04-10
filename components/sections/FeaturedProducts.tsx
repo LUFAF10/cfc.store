@@ -87,12 +87,12 @@ function ProductCard({
     <motion.div variants={cardVariants} className="group flex flex-col">
 
       {/* Image */}
-      <div className="overflow-hidden aspect-[3/4]">
+      <div className="overflow-hidden h-[45vh] md:h-auto md:aspect-[3/4]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={encodeImagePath(folder, product.file)}
           alt={`${product.team} ${product.label}`}
-          className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+          className="w-full h-full object-contain object-center md:object-cover md:object-top transition-transform duration-700 ease-out group-hover:scale-105"
         />
       </div>
 
@@ -167,10 +167,10 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
       <div className="max-w-7xl mx-auto">
 
         {/* Back + header + fitting room */}
-        <div className="mb-10 md:mb-16">
+        <div className="mb-16 md:mb-16">
 
           {/* Nav row — always visible */}
-          <div className="relative flex items-center justify-between mb-6 md:mb-0">
+          <div className="relative flex items-center justify-between mb-10 md:mb-0">
             <button
               onClick={onBack}
               className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 min-h-[44px]"
@@ -211,7 +211,7 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
             <h2 className="text-3xl font-black tracking-tight uppercase font-display text-cream-bone leading-tight">
               {title}
             </h2>
-            <p className="mt-3 mb-2 text-xs tracking-widest uppercase text-cream-bone/40 font-light leading-relaxed">
+            <p className="mt-5 text-xs tracking-widest uppercase text-cream-bone/40 font-light leading-relaxed">
               Piezas únicas — stock limitado
             </p>
           </motion.div>
