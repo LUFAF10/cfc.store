@@ -13,7 +13,7 @@ export default function Navbar({ onFittingRoom }: NavbarProps) {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-stadium-black/80 backdrop-blur-md border-b border-cream-bone/10">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/">
@@ -21,12 +21,12 @@ export default function Navbar({ onFittingRoom }: NavbarProps) {
         </Link>
 
         {/* Right side actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           {/* Guía de talles */}
           {onFittingRoom && (
             <button
               onClick={onFittingRoom}
-              className="text-cream-bone/50 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 hidden sm:block"
+              className="text-cream-bone/50 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 min-h-[44px] hidden sm:flex items-center"
             >
               Guía de Talles
             </button>
@@ -35,7 +35,7 @@ export default function Navbar({ onFittingRoom }: NavbarProps) {
           {/* Cart icon */}
           <button
             onClick={openCart}
-            className="relative text-cream-bone/60 hover:text-cream-bone transition-colors duration-200 p-1"
+            className="relative text-cream-bone/60 hover:text-cream-bone transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Abrir carrito"
           >
             <ShoppingCart size={20} strokeWidth={1.5} />

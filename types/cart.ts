@@ -5,5 +5,6 @@ export type CartItem = {
   file: string;
   folder: string;
   size: string;
+  price: number;
   quantity: number;
 };

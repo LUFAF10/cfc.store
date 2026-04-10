@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, CreditCard, Landmark, Copy, Check } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { encodeImagePath } from "@/lib/imageUtils";
+import { formatARS } from "@/lib/pricing";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -55,7 +56,7 @@ function CopyButton({ value }: { value: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, totalItems } = useCart();
+  const { items, isOpen, closeCart, removeItem, updateQuantity, totalItems, totalAmount } = useCart();
 
   const [step, setStep]       = useState<Step>("cart");
   const [loading, setLoading] = useState(false);
@@ -128,10 +129,10 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.45, ease }}
-            className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-[#080808] border-l border-cream-bone/10 flex flex-col"
+            className="fixed top-0 right-0 z-50 h-full w-full sm:max-w-md bg-[#080808] border-l border-cream-bone/10 flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-cream-bone/10 shrink-0">
+            <div className="flex items-center justify-between px-5 sm:px-8 py-5 sm:py-6 border-b border-cream-bone/10 shrink-0">
               <div className="flex items-center gap-3">
                 {step !== "cart" && (
                   <button
@@ -156,10 +157,10 @@ export default function CartDrawer() {
               </div>
               <button
                 onClick={handleClose}
-                className="text-cream-bone/40 hover:text-cream-bone transition-colors duration-200 p-1"
+                className="text-cream-bone/40 hover:text-cream-bone transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Cerrar"
               >
-                <X size={20} strokeWidth={1.5} />
+                <X size={22} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -176,7 +177,7 @@ export default function CartDrawer() {
                   transition={{ duration: 0.3, ease }}
                   className="flex flex-col flex-1 min-h-0"
                 >
-                  <div className="flex-1 overflow-y-auto px-8 py-6">
+                  <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6">
                     {items.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full gap-5 text-center">
                         <ShoppingBag size={40} strokeWidth={1} className="text-cream-bone/20" />
@@ -220,6 +221,9 @@ export default function CartDrawer() {
                                 <p className="text-cream-bone/40 text-xs tracking-wider font-light mt-0.5">
                                   Talle {item.size}
                                 </p>
+                                <p className="text-cream-bone/80 text-sm font-semibold tracking-wide mt-1">
+                                  {formatARS(item.price)}
+                                </p>
                                 <div className="flex items-center gap-4 mt-3">
                                   <div className="flex items-center gap-3 border border-cream-bone/15 px-3 py-1.5">
                                     <button onClick={() => updateQuantity(item.id, -1)} className="text-cream-bone/40 hover:text-cream-bone transition-colors duration-150" aria-label="Restar">
@@ -243,7 +247,15 @@ export default function CartDrawer() {
                   </div>
 
                   {items.length > 0 && (
-                    <div className="px-8 py-6 border-t border-cream-bone/10 shrink-0">
+                    <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0 flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-cream-bone/50 text-xs tracking-widest uppercase font-light">
+                          Total
+                        </span>
+                        <span className="text-cream-bone font-black text-xl tracking-wide font-display">
+                          {formatARS(totalAmount)}
+                        </span>
+                      </div>
                       <button
                         onClick={() => setStep("payment")}
                         className="w-full py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
@@ -263,7 +275,7 @@ export default function CartDrawer() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 24 }}
                   transition={{ duration: 0.3, ease }}
-                  className="flex flex-col flex-1 min-h-0 px-8 py-8"
+                  className="flex flex-col flex-1 min-h-0 px-5 sm:px-8 py-8"
                 >
                   <p className="text-cream-bone/50 text-xs tracking-widest uppercase font-light mb-8">
                     Elegí cómo pagar
@@ -323,7 +335,7 @@ export default function CartDrawer() {
                   transition={{ duration: 0.3, ease }}
                   className="flex flex-col flex-1 min-h-0"
                 >
-                  <div className="flex-1 overflow-y-auto px-8 py-8">
+                  <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-8">
                     <p className="text-cream-bone/50 text-xs tracking-widest uppercase font-light mb-8">
                       Datos bancarios
                     </p>
@@ -354,7 +366,7 @@ export default function CartDrawer() {
                     </p>
                   </div>
 
-                  <div className="px-8 py-6 border-t border-cream-bone/10 shrink-0">
+                  <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0">
                     <button
                       onClick={handleConfirmTransfer}
                       disabled={loading}

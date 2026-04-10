@@ -194,14 +194,14 @@ export default function FittingRoom({ onBack }: FittingRoomProps) {
   const hasInput = altura !== null || ancho !== null || longitud !== null;
 
   return (
-    <section className="bg-stadium-black min-h-screen py-24 px-6">
+    <section className="bg-stadium-black min-h-screen py-20 px-4 md:py-24 md:px-6">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-16">
+        <div className="relative flex items-center justify-between mb-10 md:mb-16">
           <button
             onClick={onBack}
-            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 pt-1"
+            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 min-h-[44px]"
           >
             ← Volver
           </button>
@@ -210,21 +210,21 @@ export default function FittingRoom({ onBack }: FittingRoomProps) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
-            className="text-center flex-1"
+            className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none"
           >
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase font-display text-cream-bone">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase font-display text-cream-bone whitespace-nowrap">
               Tu Talle
             </h2>
-            <p className="mt-3 text-sm tracking-widest uppercase text-cream-bone/60 font-light">
+            <p className="mt-1 md:mt-3 text-xs md:text-sm tracking-widest uppercase text-cream-bone/60 font-light">
               Encontrá el fit perfecto
             </p>
           </motion.div>
 
-          <div className="w-16" />
+          <div className="w-[60px]" />
         </div>
 
         {/* Main grid: inputs + mannequin */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-16 md:mb-20">
 
           {/* ── LEFT: Inputs ── */}
           <motion.div

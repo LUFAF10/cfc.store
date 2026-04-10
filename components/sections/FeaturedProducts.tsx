@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { encodeImagePath } from "@/lib/imageUtils";
+import { getPriceForFolder, formatARS } from "@/lib/pricing";
 
 export type Product = {
   team: string;
@@ -49,6 +50,8 @@ function ProductCard({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
+  const price = getPriceForFolder(folder);
+
   // Reset selection when the item is removed from the cart
   const itemId = selectedSize ? `${product.team}__${product.label}__${selectedSize}` : null;
   const isInCart = itemId ? items.some((i) => i.id === itemId) : false;
@@ -75,6 +78,7 @@ function ProductCard({
       file: product.file,
       folder,
       size: selectedSize,
+      price,
     });
     openCart();
   }
@@ -93,7 +97,7 @@ function ProductCard({
       </div>
 
       {/* Info */}
-      <div className="mt-5 flex flex-col gap-4">
+      <div className="mt-3 md:mt-5 flex flex-col gap-3 md:gap-4">
         <div>
           <p className="text-cream-bone font-black tracking-wider uppercase font-display text-lg leading-tight">
             {product.team}
@@ -101,6 +105,11 @@ function ProductCard({
           <p className="text-cream-bone/60 font-bold tracking-widest uppercase text-sm mt-0.5">
             {product.label}
           </p>
+          {price > 0 && (
+            <p className="text-cream-bone font-semibold tracking-wider text-base mt-1.5">
+              {formatARS(price)}
+            </p>
+          )}
         </div>
 
         {/* Size selector */}
@@ -114,7 +123,7 @@ function ProductCard({
                 <button
                   key={size}
                   onClick={() => { setSelectedSize(size); setError(false); }}
-                  className={`px-3 py-1.5 text-xs tracking-widest uppercase font-light border transition-all duration-200 ${
+                  className={`min-h-[44px] px-3 py-2 text-xs tracking-widest uppercase font-light border transition-all duration-200 ${
                     selectedSize === size
                       ? "bg-cream-bone text-stadium-black border-cream-bone font-bold"
                       : "border-cream-bone/25 text-cream-bone/55 hover:border-cream-bone/60 hover:text-cream-bone/80"
@@ -131,7 +140,7 @@ function ProductCard({
         <div className="flex flex-col gap-1.5">
           <button
             onClick={handleAdd}
-            className={`w-full py-3 text-xs tracking-widest uppercase font-bold transition-all duration-200 ${
+            className={`w-full py-3 min-h-[44px] text-xs tracking-widest uppercase font-bold transition-all duration-200 ${
               selectedSize
                 ? "bg-cream-bone text-stadium-black hover:opacity-90 active:scale-[0.98]"
                 : "border border-cream-bone/20 text-cream-bone/30 hover:border-cream-bone/40 hover:text-cream-bone/50 cursor-pointer"
@@ -154,14 +163,14 @@ function ProductCard({
 
 export default function FeaturedProducts({ title, folder, products, onBack, onFittingRoom }: FeaturedProductsProps) {
   return (
-    <section className="bg-stadium-black min-h-screen py-24 px-6">
+    <section className="bg-stadium-black min-h-screen py-20 px-4 md:py-24 md:px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Back + header + fitting room */}
-        <div className="flex items-start justify-between mb-16">
+        <div className="relative flex items-center justify-between mb-10 md:mb-16">
           <button
             onClick={onBack}
-            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 pt-1"
+            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 min-h-[44px]"
           >
             ← Volver
           </button>
@@ -170,22 +179,24 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
-            className="text-center flex-1"
+            className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none"
           >
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase font-display text-cream-bone">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase font-display text-cream-bone whitespace-nowrap">
               {title}
             </h2>
-            <p className="mt-3 text-sm tracking-widest uppercase text-cream-bone/40 font-light">
+            <p className="mt-1 md:mt-3 text-xs md:text-sm tracking-widest uppercase text-cream-bone/40 font-light">
               Piezas únicas — stock limitado
             </p>
           </motion.div>
 
           <button
             onClick={onFittingRoom}
-            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 flex items-center gap-2 pt-1"
+            className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 items-center gap-2 min-h-[44px] hidden md:flex"
           >
             Guía de talles →
           </button>
+          {/* Mobile spacer to balance the back button */}
+          <div className="w-[60px] md:hidden" />
         </div>
 
         {/* Grid */}
@@ -193,7 +204,7 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
         >
           {products.map((product) => (
             <ProductCard key={product.file} product={product} folder={folder} />
