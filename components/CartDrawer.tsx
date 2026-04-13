@@ -251,7 +251,7 @@ export default function CartDrawer() {
                     <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0 flex flex-col gap-4">
 
                       {/* QR — desktop only */}
-                      <div className="hidden sm:flex items-center gap-4 py-4 px-4 border border-cream-bone/10 bg-cream-bone/[0.03]">
+                      <div className="max-sm:hidden flex items-center gap-4 py-4 px-4 border border-cream-bone/10 bg-cream-bone/[0.03]">
                         <div className="shrink-0 bg-white p-2">
                           <QRCode
                             value="https://cfc-store-rgp2.vercel.app"
