@@ -6,6 +6,7 @@ import { CheckCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import FeaturedProducts, { type Product } from "@/components/sections/FeaturedProducts";
 import FittingRoom from "@/components/FittingRoom";
+import InstagramFeed from "@/components/sections/InstagramFeed";
 
 // ─── Product catalogues per category ────────────────────────────────────────
 
@@ -100,53 +101,59 @@ export default function Home() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="flex flex-col items-center min-h-screen px-4 sm:px-6 text-center bg-stadium-black pt-28 sm:pt-40 pb-20"
+            className="bg-stadium-black"
           >
-            <div className="max-w-3xl mx-auto flex flex-col items-center">
+            {/* ── Hero ── */}
+            <div className="flex flex-col items-center min-h-screen px-4 sm:px-6 text-center pt-36 sm:pt-48 pb-24">
+              <div className="max-w-3xl mx-auto flex flex-col items-center">
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, ease }}
-                className="mb-6"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/logo-transparente.png" alt="Club Futbol Collection" className="mx-auto w-64" />
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.15, ease }}
-                className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-none text-cream-bone uppercase font-display text-center mb-8 sm:mb-10"
-              >
-                Arma tu Colección Perfecta
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3, ease }}
-                className="max-w-xl text-base md:text-lg text-cream-bone font-light leading-relaxed text-center mb-16"
-              >
-                Encuentra las joyas retro que definieron la historia del fútbol mundial.
-                Tu pasión, tu museo personal.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.45, ease }}
-              >
-                <button
-                  onClick={() => setCurrentView("categories")}
-                  className="px-12 py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:scale-105 hover:shadow-[0_0_24px_rgba(242,232,198,0.45)] active:scale-95"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.7, ease }}
+                  className="mb-6"
                 >
-                  Empezar Mi Colección
-                </button>
-              </motion.div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/logo-transparente.png" alt="Club Futbol Collection" className="mx-auto w-64" />
+                </motion.div>
 
+                <motion.h1
+                  initial={{ opacity: 0, y: 28 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.15, ease }}
+                  className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-none text-cream-bone uppercase font-display text-center mb-8 sm:mb-10"
+                >
+                  Arma tu Colección Perfecta
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3, ease }}
+                  className="max-w-xl text-base md:text-lg text-cream-bone font-light leading-relaxed text-center mb-16"
+                >
+                  Encuentra las joyas retro que definieron la historia del fútbol mundial.
+                  Tu pasión, tu museo personal.
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.45, ease }}
+                >
+                  <button
+                    onClick={() => setCurrentView("categories")}
+                    className="px-12 py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:scale-105 hover:shadow-[0_0_24px_rgba(242,232,198,0.45)] active:scale-95"
+                  >
+                    Empezar Mi Colección
+                  </button>
+                </motion.div>
+
+              </div>
             </div>
+
+            {/* ── Instagram feed ── */}
+            <InstagramFeed />
           </motion.main>
         )}
 
@@ -158,7 +165,7 @@ export default function Home() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="flex flex-col min-h-screen bg-stadium-black px-4 sm:px-6 pt-24 sm:pt-32 pb-20"
+            className="flex flex-col min-h-screen bg-stadium-black px-4 sm:px-6 pt-32 sm:pt-40 pb-20"
           >
             <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 

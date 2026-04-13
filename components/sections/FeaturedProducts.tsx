@@ -12,6 +12,7 @@ export type Product = {
   label: string;
   sizes: string[];
   file: string;
+  file2?: string; // optional back/alternate image — shown on hover
 };
 
 interface FeaturedProductsProps {
@@ -90,17 +91,28 @@ function ProductCard({
     <motion.div variants={cardVariants} className="group flex flex-col">
 
       {/* Image */}
-      <div className={`overflow-hidden ${folder === "CAMISETAS" ? "aspect-[3/4]" : "h-[45vh] md:h-auto md:aspect-[3/4]"}`}>
+      <div className={`relative overflow-hidden ${folder === "CAMISETAS" ? "aspect-[3/4]" : "h-[45vh] md:h-auto md:aspect-[3/4]"}`}>
+        {/* Primary image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={encodeImagePath(folder, product.file)}
           alt={`${product.team} ${product.label}`}
-          className={`w-full h-full transition-transform duration-700 ease-out group-hover:scale-105 ${
-            folder === "CAMISETAS"
-              ? "object-cover object-top"
-              : "object-contain object-center md:object-cover md:object-top"
-          }`}
+          className={`absolute inset-0 w-full h-full transition-all duration-700 ease-out ${
+            folder === "CAMISETAS" ? "object-cover object-top" : "object-contain object-center md:object-cover md:object-top"
+          } ${product.file2 ? "group-hover:opacity-0" : "group-hover:scale-105"}`}
         />
+        {/* Secondary image (hover) — only rendered when file2 exists */}
+        {product.file2 && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={encodeImagePath(folder, product.file2)}
+            alt={`${product.team} ${product.label} — vista alternativa`}
+            aria-hidden="true"
+            className={`absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out ${
+              folder === "CAMISETAS" ? "object-cover object-top" : "object-contain object-center md:object-cover md:object-top"
+            }`}
+          />
+        )}
       </div>
 
       {/* Info */}
@@ -181,7 +193,7 @@ function ProductCard({
 
 export default function FeaturedProducts({ title, folder, products, onBack, onFittingRoom }: FeaturedProductsProps) {
   return (
-    <section className="bg-stadium-black min-h-screen py-20 px-4 md:py-24 md:px-6">
+    <section className="bg-stadium-black min-h-screen pt-28 pb-20 px-4 md:pt-32 md:pb-24 md:px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Back + header + fitting room */}

@@ -194,7 +194,7 @@ export default function FittingRoom({ onBack }: FittingRoomProps) {
   const hasInput = altura !== null || ancho !== null || longitud !== null;
 
   return (
-    <section className="bg-stadium-black min-h-screen py-20 px-4 md:py-24 md:px-6">
+    <section className="bg-stadium-black min-h-screen pt-28 pb-20 px-4 md:pt-32 md:pb-24 md:px-6">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
