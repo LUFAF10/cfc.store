@@ -11,6 +11,7 @@ import { formatARS } from "@/lib/pricing";
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const WHATSAPP_NUMBER = "542615417818";
+const MP_PAYMENT_LINK = "https://link.mercadopago.com.ar/clubfut";
 
 // ← Reemplazá con tus datos bancarios reales
 const BANK_DETAILS = {
@@ -60,7 +61,7 @@ export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, totalItems, totalAmount } = useCart();
 
   const [step, setStep]       = useState<Step>("cart");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // used by bank transfer flow
   const [error, setError]     = useState<string | null>(null);
 
   function handleClose() {
@@ -70,24 +71,9 @@ export default function CartDrawer() {
   }
 
   // ── Mercado Pago ────────────────────────────────────────────────────────────
-  async function handleMercadoPago() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod: "mp" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error al conectar con Mercado Pago.");
-      handleClose();
-      window.open(data.init_point, "_blank");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error inesperado.");
-    } finally {
-      setLoading(false);
-    }
+  function handleMercadoPago() {
+    handleClose();
+    window.open(MP_PAYMENT_LINK, "_blank");
   }
 
   // ── Bank transfer confirm ───────────────────────────────────────────────────
@@ -254,7 +240,7 @@ export default function CartDrawer() {
                       <div className="max-sm:hidden flex items-center gap-4 py-4 px-4 border border-cream-bone/10 bg-cream-bone/[0.03]">
                         <div className="shrink-0 bg-white p-2">
                           <QRCode
-                            value="https://cfc-store-rgp2.vercel.app"
+                            value={MP_PAYMENT_LINK}
                             size={72}
                             bgColor="#ffffff"
                             fgColor="#000000"
@@ -268,7 +254,7 @@ export default function CartDrawer() {
                             </p>
                           </div>
                           <p className="text-cream-bone/40 text-xs font-light leading-relaxed">
-                            Escaneá el QR para abrir la tienda en tu teléfono y completar la compra.
+                            Escaneá con la cámara o la app de Mercado Pago para pagar directo.
                           </p>
                         </div>
                       </div>
@@ -312,13 +298,12 @@ export default function CartDrawer() {
                     {/* Mercado Pago */}
                     <button
                       onClick={handleMercadoPago}
-                      disabled={loading}
-                      className="group w-full flex items-center gap-5 px-6 py-5 border border-cream-bone/15 hover:border-cream-bone/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left"
+                      className="group w-full flex items-center gap-5 px-6 py-5 border border-cream-bone/15 hover:border-cream-bone/40 transition-all duration-200 text-left"
                     >
                       <CreditCard size={22} strokeWidth={1.2} className="text-cream-bone/50 group-hover:text-cream-bone transition-colors duration-200 shrink-0" />
                       <div>
                         <p className="text-cream-bone font-bold text-sm tracking-widest uppercase">
-                          {loading ? "Conectando…" : "Mercado Pago"}
+                          Mercado Pago
                         </p>
                         <p className="text-cream-bone/40 text-xs font-light mt-0.5">
                           Tarjeta de crédito / débito
