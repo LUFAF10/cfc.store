@@ -39,32 +39,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const preference = new Preference(mp);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+    try {
+      const preference = new Preference(mp);
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+      const isLocalhost = baseUrl.includes("localhost");
 
-    const isLocalhost = baseUrl.includes("localhost");
+      const result = await preference.create({
+        body: {
+          items: items.map((i, index) => ({
+            id: String(index + 1),
+            title: `${i.team} ${i.label} Talle ${i.size}`,
+            quantity: i.quantity,
+            unit_price: i.price,
+            currency_id: "ARS",
+          })),
+          ...(!isLocalhost && {
+            back_urls: {
+              success: `${baseUrl}/`,
+              failure: `${baseUrl}/`,
+              pending: `${baseUrl}/`,
+            },
+            auto_return: "approved" as const,
+          }),
+        },
+      });
 
-    const result = await preference.create({
-      body: {
-        items: items.map((i) => ({
-          id: i.id,
-          title: `${i.team} ${i.label} — Talle ${i.size}`,
-          quantity: i.quantity,
-          unit_price: i.price,
-          currency_id: "ARS",
-        })),
-        ...(!isLocalhost && {
-          back_urls: {
-            success: `${baseUrl}/`,
-            failure: `${baseUrl}/`,
-            pending: `${baseUrl}/`,
-          },
-          auto_return: "approved" as const,
-        }),
-      },
-    });
+      if (!result.init_point) {
+        console.error("[mp] preference created but init_point is missing:", result);
+        return NextResponse.json(
+          { error: "No se pudo obtener el link de pago de Mercado Pago." },
+          { status: 500 },
+        );
+      }
 
-    return NextResponse.json({ init_point: result.init_point });
+      return NextResponse.json({ init_point: result.init_point });
+    } catch (err) {
+      console.error("[mp] Error creando preferencia:", JSON.stringify(err, null, 2));
+      const message = err instanceof Error ? err.message : "Error al conectar con Mercado Pago.";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
   }
 
   // ── Bank transfer flow ──────────────────────────────────────────────────────
