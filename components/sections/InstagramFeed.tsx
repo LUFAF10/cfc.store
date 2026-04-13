@@ -6,7 +6,7 @@ const PHOTO_COUNT = 6;
 
 // Photos go in /public/images/instagram/ named ig-1.jpg … ig-6.jpg
 const PHOTOS = Array.from({ length: PHOTO_COUNT }, (_, i) => ({
-  src: `/images/instagram/ig-${i + 1}.jpg`,
+  src: `/images/instagram/ig-${i + 1}.jpeg`,
   alt: `Club Football Collection — foto ${i + 1}`,
 }));
 
