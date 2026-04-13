@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import FeaturedProducts, { type Product } from "@/components/sections/FeaturedProducts";
 import FittingRoom from "@/components/FittingRoom";
@@ -51,7 +52,7 @@ const CATEGORY_LIST: { label: string; key: CategoryKey | null }[] = [
 
 // ─── Shared animation config ─────────────────────────────────────────────────
 
-type View = "home" | "categories" | "products" | "fitting";
+type View = "home" | "categories" | "products" | "fitting" | "success";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -66,6 +67,17 @@ const viewVariants = {
 export default function Home() {
   const [currentView, setCurrentView]           = useState<View>("home");
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
+
+  // Detect MP payment success redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("collection_status") ?? params.get("status");
+    if (status === "approved") {
+      setCurrentView("success");
+      // Clean up URL params without reload
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   function openCategory(key: CategoryKey) {
     setSelectedCategory(key);
@@ -241,6 +253,57 @@ export default function Home() {
           >
             <FittingRoom onBack={() => setCurrentView("products")} />
           </motion.div>
+        )}
+
+        {/* ── SUCCESS ──────────────────────────────────────────────────────── */}
+        {currentView === "success" && (
+          <motion.main
+            key="success"
+            variants={viewVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex flex-col items-center justify-center min-h-screen px-6 text-center bg-stadium-black"
+          >
+            <div className="max-w-md mx-auto flex flex-col items-center gap-8">
+
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              >
+                <CheckCircle size={64} strokeWidth={1} className="text-cream-bone" />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3, ease }}
+                className="flex flex-col items-center gap-4"
+              >
+                <h1 className="text-4xl sm:text-5xl font-black tracking-tight uppercase font-display text-cream-bone leading-tight">
+                  ¡Gracias por tu compra!
+                </h1>
+                <p className="text-cream-bone/60 font-light leading-relaxed text-base">
+                  Tu pago fue procesado con éxito. En breve nos ponemos en contacto para coordinar el envío.
+                </p>
+                <p className="text-cream-bone/35 text-xs tracking-widest uppercase font-light">
+                  Club Fútbol Collection
+                </p>
+              </motion.div>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.6, ease }}
+                onClick={() => setCurrentView("home")}
+                className="mt-4 px-10 py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-90 active:scale-95"
+              >
+                Seguir Comprando
+              </motion.button>
+
+            </div>
+          </motion.main>
         )}
 
       </AnimatePresence>
