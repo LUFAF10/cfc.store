@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minus, Plus, ShoppingBag, CreditCard, Landmark, Copy, Check, Smartphone } from "lucide-react";
-import QRCode from "react-qr-code";
+import { X, Minus, Plus, ShoppingBag, CreditCard, Landmark, Copy, Check } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { encodeImagePath } from "@/lib/imageUtils";
 import { formatARS } from "@/lib/pricing";
@@ -62,11 +61,6 @@ export default function CartDrawer() {
   const [step, setStep]       = useState<Step>("cart");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    setIsDesktop(window.innerWidth >= 640);
-  }, []);
 
   function handleClose() {
     closeCart();
@@ -256,31 +250,6 @@ export default function CartDrawer() {
 
                   {items.length > 0 && (
                     <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0 flex flex-col gap-4">
-
-                      {/* QR — desktop only */}
-                      {isDesktop && (
-                        <div className="flex items-center gap-4 py-4 px-4 border border-cream-bone/10 bg-cream-bone/[0.03]">
-                          <div className="shrink-0 bg-white p-2">
-                            <QRCode
-                              value="https://cfc-store-rgp2.vercel.app"
-                              size={72}
-                              bgColor="#ffffff"
-                              fgColor="#000000"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5">
-                              <Smartphone size={12} strokeWidth={1.5} className="text-cream-bone/50" />
-                              <p className="text-cream-bone/80 text-xs font-bold tracking-widest uppercase">
-                                Pagá desde el celular
-                              </p>
-                            </div>
-                            <p className="text-cream-bone/40 text-xs font-light leading-relaxed">
-                              Escaneá con tu cámara para abrir la tienda en el celular.
-                            </p>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Total */}
                       <div className="flex items-center justify-between">
