@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
           id: i.id,
           title: `${i.team} ${i.label} — Talle ${i.size}`,
           quantity: i.quantity,
-          unit_price: 1, // ← reemplazar con precio real por producto
+          unit_price: i.price,
           currency_id: "ARS",
         })),
         ...(!isLocalhost && {
