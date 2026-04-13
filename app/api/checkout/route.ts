@@ -7,7 +7,7 @@ import type { CartItem } from "@/types/cart";
 export const runtime = "nodejs";
 
 const mp = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN ?? "",
+  accessToken: (process.env.MP_ACCESS_TOKEN ?? "").trim(),
 });
 
 export async function POST(req: NextRequest) {
