@@ -71,9 +71,24 @@ export default function CartDrawer() {
   }
 
   // ── Mercado Pago ────────────────────────────────────────────────────────────
-  function handleMercadoPago() {
-    handleClose();
-    window.open(MP_PAYMENT_LINK, "_blank");
+  async function handleMercadoPago() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, paymentMethod: "mp" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error al conectar con Mercado Pago.");
+      handleClose();
+      window.open(data.init_point, "_blank");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error inesperado.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   // ── Bank transfer confirm ───────────────────────────────────────────────────
@@ -298,12 +313,13 @@ export default function CartDrawer() {
                     {/* Mercado Pago */}
                     <button
                       onClick={handleMercadoPago}
-                      className="group w-full flex items-center gap-5 px-6 py-5 border border-cream-bone/15 hover:border-cream-bone/40 transition-all duration-200 text-left"
+                      disabled={loading}
+                      className="group w-full flex items-center gap-5 px-6 py-5 border border-cream-bone/15 hover:border-cream-bone/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left"
                     >
                       <CreditCard size={22} strokeWidth={1.2} className="text-cream-bone/50 group-hover:text-cream-bone transition-colors duration-200 shrink-0" />
                       <div>
                         <p className="text-cream-bone font-bold text-sm tracking-widest uppercase">
-                          Mercado Pago
+                          {loading ? "Conectando…" : "Mercado Pago"}
                         </p>
                         <p className="text-cream-bone/40 text-xs font-light mt-0.5">
                           Tarjeta de crédito / débito
