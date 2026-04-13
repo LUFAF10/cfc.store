@@ -53,9 +53,9 @@ export async function POST(req: NextRequest) {
         })),
         ...(!isLocalhost && {
           back_urls: {
-            success: `${baseUrl}/`,
+            success: `${baseUrl}/success`,
             failure: `${baseUrl}/`,
-            pending: `${baseUrl}/`,
+            pending: `${baseUrl}/success`,
           },
           auto_return: "approved" as const,
         }),

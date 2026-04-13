@@ -23,13 +23,10 @@ const BANK_DETAILS = {
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-type Step = "cart" | "payment" | "bank";
+type Step = "cart" | "payment" | "bank" | "confirmed";
 
-function buildWhatsAppURL(items: ReturnType<typeof useCart>["items"]): string {
-  const lines = items
-    .map((i) => `- ${i.quantity}x ${i.team.toUpperCase()} ${i.label.toUpperCase()} (Talle ${i.size})`)
-    .join("\n");
-  const message = `¡Hola CFC! Quiero finalizar mi pedido:\n\n${lines}\n\n¡Muchas gracias!`;
+function buildPostPurchaseWhatsAppURL(method: string): string {
+  const message = `¡Hola CFC! Acabo de realizar una compra. Mi método de pago fue ${method}. Aquí te envío mi comprobante y los datos para el envío:`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -105,8 +102,7 @@ export default function CartDrawer() {
     } finally {
       setLoading(false);
     }
-    window.open(buildWhatsAppURL(items), "_blank");
-    handleClose();
+    setStep("confirmed");
   }
 
   return (
@@ -136,7 +132,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 sm:px-8 py-5 sm:py-6 border-b border-cream-bone/10 shrink-0">
               <div className="flex items-center gap-3">
-                {step !== "cart" && (
+                {step !== "cart" && step !== "confirmed" && (
                   <button
                     onClick={() => { setStep(step === "bank" ? "payment" : "cart"); setError(null); }}
                     className="text-cream-bone/40 hover:text-cream-bone text-xs tracking-widest uppercase font-light transition-colors duration-200 mr-1"
@@ -146,9 +142,10 @@ export default function CartDrawer() {
                 )}
                 <div>
                   <h2 className="font-display font-black uppercase tracking-tight text-2xl text-cream-bone">
-                    {step === "cart"    && "Carrito"}
-                    {step === "payment" && "Pago"}
-                    {step === "bank"    && "Transferencia"}
+                    {step === "cart"      && "Carrito"}
+                    {step === "payment"   && "Pago"}
+                    {step === "bank"      && "Transferencia"}
+                    {step === "confirmed" && "¡Confirmado!"}
                   </h2>
                   {step === "cart" && totalItems > 0 && (
                     <p className="text-cream-bone/50 text-xs tracking-widest uppercase font-light mt-0.5">
@@ -378,6 +375,61 @@ export default function CartDrawer() {
                       className="w-full py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
                     >
                       {loading ? "Enviando…" : "Confirmar y enviar comprobante"}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── STEP: Confirmed (bank transfer) ─────────────────────── */}
+              {step === "confirmed" && (
+                <motion.div
+                  key="confirmed"
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 24 }}
+                  transition={{ duration: 0.3, ease }}
+                  className="flex flex-col flex-1 min-h-0 px-5 sm:px-8 py-10"
+                >
+                  <div className="flex flex-col flex-1 justify-center gap-8">
+                    {/* Icon */}
+                    <div className="flex flex-col gap-4">
+                      <div className="w-12 h-12 border border-cream-bone/20 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.2"
+                          className="w-6 h-6 text-cream-bone/70"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-cream-bone font-display font-black uppercase tracking-tight text-xl leading-tight">
+                          Tu pedido fue recibido
+                        </p>
+                        <p className="text-cream-bone/45 text-xs font-light mt-2 leading-relaxed tracking-wide">
+                          Para confirmar el envío, envianos el comprobante de transferencia por WhatsApp junto con tus datos de entrega.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <a
+                      href={buildPostPurchaseWhatsAppURL("Transferencia Bancaria")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase text-center transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+                    >
+                      Enviar comprobante y coordinar envío
+                    </a>
+
+                    <button
+                      onClick={handleClose}
+                      className="text-cream-bone/30 hover:text-cream-bone/60 text-xs tracking-widest uppercase font-light text-center transition-colors duration-200"
+                    >
+                      Cerrar
                     </button>
                   </div>
                 </motion.div>
