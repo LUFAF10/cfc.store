@@ -1,36 +1,10 @@
-import fs from "fs/promises";
-import path from "path";
+"use client";
+
+import { useEffect, useState } from "react";
 import InstagramFeedGrid from "./InstagramFeedGrid";
 
-// ─── Config ───────────────────────────────────────────────────────────────────
-
-const IG_HANDLE   = "clubfootball.co";
-const IG_URL      = `https://www.instagram.com/${IG_HANDLE}/`;
-const IMAGE_EXTS  = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
-// Set to 0 to show all photos
-const MAX_PHOTOS  = 0;
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function naturalOrder(a: string, b: string) {
-  return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-}
-
-async function getInstagramPhotos(): Promise<string[]> {
-  const dir = path.join(process.cwd(), "public", "images", "instagram");
-  try {
-    const files = await fs.readdir(dir);
-    const images = files
-      .filter((f) => IMAGE_EXTS.has(path.extname(f).toLowerCase()))
-      .sort(naturalOrder);
-    const limited = MAX_PHOTOS > 0 ? images.slice(0, MAX_PHOTOS) : images;
-    return limited.map((f) => `/images/instagram/${f}`);
-  } catch {
-    return [];
-  }
-}
-
-// ─── Instagram icon (used in header — server-safe SVG) ───────────────────────
+const IG_HANDLE = "clubfootball.co";
+const IG_URL    = `https://www.instagram.com/${IG_HANDLE}/`;
 
 function InstagramIcon() {
   return (
@@ -50,10 +24,15 @@ function InstagramIcon() {
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+export default function InstagramFeed() {
+  const [photos, setPhotos] = useState<string[]>([]);
 
-export default async function InstagramFeed() {
-  const photos = await getInstagramPhotos();
+  useEffect(() => {
+    fetch("/api/instagram-photos")
+      .then((r) => r.json())
+      .then((data) => setPhotos(data.photos ?? []))
+      .catch(() => {});
+  }, []);
 
   if (photos.length === 0) return null;
 
@@ -82,7 +61,7 @@ export default async function InstagramFeed() {
           </a>
         </div>
 
-        {/* Grid + CTA (client component for animations) */}
+        {/* Grid + CTA */}
         <InstagramFeedGrid photos={photos} />
 
       </div>
