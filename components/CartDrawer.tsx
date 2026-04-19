@@ -227,6 +227,7 @@ export default function CartDrawer() {
                         </div>
                       </div>
                     ) : (
+                      <>
                       <ul className="flex flex-col gap-6">
                         <AnimatePresence initial={false}>
                           {items.map((item) => (
@@ -316,6 +317,7 @@ export default function CartDrawer() {
                           </div>
                         ))}
                       </div>
+                      </>
                     )}
                   </div>
 
