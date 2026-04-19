@@ -12,9 +12,14 @@ const transporter = nodemailer.createTransport({
 function buildEmailHTML(
   items: CartItem[],
   paymentMethod: "mp" | "transfer",
+  promoCode?: string | null,
+  discountPct?: number,
 ): string {
   const methodLabel =
     paymentMethod === "mp" ? "Mercado Pago / Tarjeta" : "Transferencia Bancaria";
+  const subtotal       = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const discountAmount = promoCode && discountPct ? Math.round(subtotal * discountPct / 100) : 0;
+  const total          = subtotal - discountAmount;
 
   const rows = items
     .map(
@@ -65,6 +70,27 @@ function buildEmailHTML(
           </tr>
           <!-- Items -->
           ${rows}
+          <!-- Totals -->
+          <tr>
+            <td colspan="3" style="padding:20px 32px 0;">
+              ${promoCode ? `
+              <table style="width:100%;border-collapse:collapse;">
+                <tr>
+                  <td style="font-family:sans-serif;font-size:11px;color:#F2E8C660;letter-spacing:1px;padding:4px 0;">Subtotal</td>
+                  <td style="font-family:sans-serif;font-size:11px;color:#F2E8C660;letter-spacing:1px;padding:4px 0;text-align:right;">$${subtotal.toLocaleString("es-AR")}</td>
+                </tr>
+                <tr>
+                  <td style="font-family:sans-serif;font-size:11px;color:#F2E8C660;letter-spacing:1px;padding:4px 0;">Descuento (${promoCode} ${discountPct}%)</td>
+                  <td style="font-family:sans-serif;font-size:11px;color:#F2E8C660;letter-spacing:1px;padding:4px 0;text-align:right;">− $${discountAmount.toLocaleString("es-AR")}</td>
+                </tr>
+                <tr>
+                  <td style="font-family:sans-serif;font-size:13px;font-weight:700;color:#F2E8C6;letter-spacing:2px;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid #1a1a1a;">Total</td>
+                  <td style="font-family:sans-serif;font-size:13px;font-weight:700;color:#F2E8C6;letter-spacing:2px;padding:8px 0 4px;text-align:right;border-top:1px solid #1a1a1a;">$${total.toLocaleString("es-AR")}</td>
+                </tr>
+              </table>
+              ` : ""}
+            </td>
+          </tr>
           <!-- Footer -->
           <tr>
             <td colspan="3" style="padding:24px 32px;font-family:sans-serif;font-size:11px;color:#F2E8C640;letter-spacing:1px;">
@@ -80,17 +106,17 @@ function buildEmailHTML(
 export async function sendOrderNotification(
   items: CartItem[],
   paymentMethod: "mp" | "transfer",
+  promoCode?: string | null,
+  discountPct?: number,
 ): Promise<void> {
-  const methodLabel =
-    paymentMethod === "mp" ? "Mercado Pago" : "Transferencia";
-  const summary = items
-    .map((i) => `${i.quantity}x ${i.team} ${i.label} (Talle ${i.size})`)
-    .join(", ");
+  const methodLabel = paymentMethod === "mp" ? "Mercado Pago" : "Transferencia";
+  const summary     = items.map((i) => `${i.quantity}x ${i.team} ${i.label} (Talle ${i.size})`).join(", ");
+  const promoSuffix = promoCode ? ` — ${promoCode} -${discountPct}%` : "";
 
   await transporter.sendMail({
     from: `"CFC Tienda" <${process.env.EMAIL_USER}>`,
     to: process.env.EMAIL_TO ?? "facuconsorte1@gmail.com",
-    subject: `🛒 Nuevo pedido — ${methodLabel} — ${summary.slice(0, 60)}`,
-    html: buildEmailHTML(items, paymentMethod),
+    subject: `🛒 Nuevo pedido — ${methodLabel}${promoSuffix} — ${summary.slice(0, 60)}`,
+    html: buildEmailHTML(items, paymentMethod, promoCode, discountPct),
   });
 }

@@ -6,18 +6,19 @@ import Link from "next/link";
 
 const WHATSAPP_NUMBER = "542615417818";
 
-function buildPostPurchaseWhatsAppURL(method: string): string {
-  const message = `¡Hola CFC! Acabo de realizar una compra. Mi método de pago fue ${method}. Aquí te envío mi comprobante y los datos para el envío:`;
+function buildPostPurchaseWhatsAppURL(method: string, promo?: string | null): string {
+  const promoLine = promo ? ` Código aplicado: ${promo}.` : "";
+  const message = `¡Hola CFC! Acabo de realizar una compra. Mi método de pago fue ${method}.${promoLine} Aquí te envío mi comprobante y los datos para el envío:`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 function SuccessContent() {
   const params = useSearchParams();
-  // Mercado Pago appends status to the redirect URL
-  const status = params.get("status") ?? params.get("collection_status");
+  const status     = params.get("status") ?? params.get("collection_status");
   const isApproved = !status || status === "approved";
+  const promo      = params.get("promo");
 
-  const waURL = buildPostPurchaseWhatsAppURL("Mercado Pago");
+  const waURL = buildPostPurchaseWhatsAppURL("Mercado Pago", promo);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-stadium-black text-cream-bone">

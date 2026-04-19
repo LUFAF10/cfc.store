@@ -14,6 +14,14 @@ import type { CartItem } from "@/types/cart";
 
 export type { CartItem } from "@/types/cart";
 
+// ─── Promo codes ─────────────────────────────────────────────────────────────
+
+export const PROMO_CODES: Record<string, number> = {
+  JDXCFC: 10, // 10% off
+};
+
+export type PromoResult = "valid" | "invalid" | "already_applied";
+
 type CartContextType = {
   items: CartItem[];
   addItem: (product: Omit<CartItem, "id" | "quantity">) => void;
@@ -21,6 +29,14 @@ type CartContextType = {
   updateQuantity: (id: string, delta: number) => void;
   totalItems: number;
   totalAmount: number;
+  // Promo
+  promoCode: string | null;
+  discountPct: number;
+  discountAmount: number;
+  discountedTotal: number;
+  applyPromoCode: (code: string) => PromoResult;
+  clearPromoCode: () => void;
+  // Cart drawer
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -38,6 +54,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [discountPct, setDiscountPct] = useState(0);
 
   // Hydrate from localStorage once on mount
   useEffect(() => {
@@ -85,8 +103,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const totalItems  = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const totalItems     = items.reduce((sum, i) => sum + i.quantity, 0);
+  const totalAmount    = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const discountAmount = Math.round(totalAmount * discountPct / 100);
+  const discountedTotal = totalAmount - discountAmount;
+
+  const applyPromoCode = useCallback((code: string): PromoResult => {
+    const normalized = code.trim().toUpperCase();
+    if (promoCode) return "already_applied";
+    const pct = PROMO_CODES[normalized];
+    if (!pct) return "invalid";
+    setPromoCode(normalized);
+    setDiscountPct(pct);
+    return "valid";
+  }, [promoCode]);
+
+  const clearPromoCode = useCallback(() => {
+    setPromoCode(null);
+    setDiscountPct(0);
+  }, []);
 
   return (
     <CartContext.Provider
@@ -97,6 +132,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         totalItems,
         totalAmount,
+        promoCode,
+        discountPct,
+        discountAmount,
+        discountedTotal,
+        applyPromoCode,
+        clearPromoCode,
         isOpen,
         openCart: () => setIsOpen(true),
         closeCart: () => setIsOpen(false),

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { sendOrderNotification } from "@/lib/mailer";
+import { PROMO_CODES } from "@/context/CartContext";
 import type { CartItem } from "@/types/cart";
 
 // Force Node.js runtime (required for nodemailer)
@@ -10,9 +11,15 @@ export async function POST(req: NextRequest) {
   const body = await req.json() as {
     items: CartItem[];
     paymentMethod: "mp" | "transfer";
+    promoCode?: string;
   };
 
   const { items, paymentMethod } = body;
+
+  // Re-validate promo server-side (never trust client)
+  const normalizedPromo = body.promoCode?.trim().toUpperCase() ?? null;
+  const discountPct     = normalizedPromo ? (PROMO_CODES[normalizedPromo] ?? 0) : 0;
+  const discountFactor  = 1 - discountPct / 100;
 
   if (!items?.length) {
     return NextResponse.json({ error: "El carrito está vacío." }, { status: 400 });
@@ -20,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   // ── Email notification (both flows) ────────────────────────────────────────
   try {
-    await sendOrderNotification(items, paymentMethod);
+    await sendOrderNotification(items, paymentMethod, normalizedPromo, discountPct);
   } catch (err) {
     console.error("[mailer] Error sending notification:", err);
   }
@@ -48,14 +55,14 @@ export async function POST(req: NextRequest) {
           id: String(index + 1),
           title: `${i.team} ${i.label} Talle ${i.size}`.slice(0, 256),
           quantity: i.quantity,
-          unit_price: i.price,
+          unit_price: Math.round(i.price * discountFactor),
           currency_id: "ARS",
         })),
         ...(!isLocalhost && {
           back_urls: {
-            success: `${baseUrl}/success`,
+            success: `${baseUrl}/success${normalizedPromo ? `?promo=${normalizedPromo}` : ""}`,
             failure: `${baseUrl}/`,
-            pending: `${baseUrl}/success`,
+            pending: `${baseUrl}/success${normalizedPromo ? `?promo=${normalizedPromo}` : ""}`,
           },
           auto_return: "approved" as const,
         }),

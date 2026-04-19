@@ -25,8 +25,9 @@ const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 type Step = "cart" | "payment" | "bank" | "confirmed";
 
-function buildPostPurchaseWhatsAppURL(method: string): string {
-  const message = `¡Hola CFC! Acabo de realizar una compra. Mi método de pago fue ${method}. Aquí te envío mi comprobante y los datos para el envío:`;
+function buildPostPurchaseWhatsAppURL(method: string, promo?: string | null): string {
+  const promoLine = promo ? ` Código aplicado: ${promo}.` : "";
+  const message = `¡Hola CFC! Acabo de realizar una compra. Mi método de pago fue ${method}.${promoLine} Aquí te envío mi comprobante y los datos para el envío:`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -53,16 +54,33 @@ function CopyButton({ value }: { value: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, totalItems, totalAmount } = useCart();
+  const {
+    items, isOpen, closeCart, removeItem, updateQuantity,
+    totalItems, totalAmount,
+    promoCode, discountPct, discountAmount, discountedTotal,
+    applyPromoCode, clearPromoCode,
+  } = useCart();
 
   const [step, setStep]       = useState<Step>("cart");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
+  const [promoInput, setPromoInput]   = useState("");
+  const [promoStatus, setPromoStatus] = useState<"idle" | "valid" | "invalid">("idle");
 
   function handleClose() {
     closeCart();
-    // Reset step after drawer exits
-    setTimeout(() => { setStep("cart"); setError(null); }, 400);
+    setTimeout(() => { setStep("cart"); setError(null); setPromoInput(""); setPromoStatus("idle"); }, 400);
+  }
+
+  function handleApplyPromo() {
+    if (!promoInput.trim()) return;
+    const result = applyPromoCode(promoInput);
+    if (result === "valid") {
+      setPromoStatus("valid");
+      setPromoInput("");
+    } else {
+      setPromoStatus("invalid");
+    }
   }
 
   // ── Mercado Pago ────────────────────────────────────────────────────────────
@@ -73,7 +91,7 @@ export default function CartDrawer() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod: "mp" }),
+        body: JSON.stringify({ items, paymentMethod: "mp", promoCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al conectar con Mercado Pago.");
@@ -95,7 +113,7 @@ export default function CartDrawer() {
       await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod: "transfer" }),
+        body: JSON.stringify({ items, paymentMethod: "transfer", promoCode }),
       });
     } catch {
       // email failure is non-blocking
@@ -248,14 +266,70 @@ export default function CartDrawer() {
                   {items.length > 0 && (
                     <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0 flex flex-col gap-4">
 
-                      {/* Total */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-cream-bone/50 text-xs tracking-widest uppercase font-light">
-                          Total
-                        </span>
-                        <span className="text-cream-bone font-black text-xl tracking-wide font-display">
-                          {formatARS(totalAmount)}
-                        </span>
+                      {/* Promo code input */}
+                      {!promoCode ? (
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={promoInput}
+                              onChange={(e) => { setPromoInput(e.target.value); setPromoStatus("idle"); }}
+                              onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
+                              placeholder="Código de promoción"
+                              className="flex-1 bg-transparent border border-cream-bone/20 text-cream-bone text-xs tracking-widest uppercase font-light px-3 py-2.5 placeholder:text-cream-bone/25 placeholder:normal-case focus:outline-none focus:border-cream-bone/50 transition-colors duration-200"
+                            />
+                            <button
+                              onClick={handleApplyPromo}
+                              className="px-4 py-2.5 border border-cream-bone/20 text-cream-bone/60 hover:text-cream-bone hover:border-cream-bone/50 text-xs tracking-widest uppercase font-light transition-all duration-200 shrink-0"
+                            >
+                              Aplicar
+                            </button>
+                          </div>
+                          {promoStatus === "invalid" && (
+                            <p className="text-cream-bone/40 text-[10px] tracking-wider font-light">
+                              Código no válido
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <span className="text-cream-bone/50 text-[10px] tracking-widest uppercase font-light">
+                            Código: <span className="text-cream-bone/80">{promoCode}</span> · {discountPct}% aplicado
+                          </span>
+                          <button
+                            onClick={() => { clearPromoCode(); setPromoStatus("idle"); }}
+                            className="text-cream-bone/30 hover:text-cream-bone/60 text-[10px] tracking-widest uppercase font-light transition-colors duration-200"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Totals breakdown */}
+                      <div className="flex flex-col gap-2">
+                        {promoCode ? (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <span className="text-cream-bone/40 text-xs tracking-widest uppercase font-light">Subtotal</span>
+                              <span className="text-cream-bone/60 text-sm font-light">{formatARS(totalAmount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-cream-bone/40 text-xs tracking-widest uppercase font-light">
+                                Descuento ({promoCode} {discountPct}%)
+                              </span>
+                              <span className="text-cream-bone/60 text-sm font-light">− {formatARS(discountAmount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between border-t border-cream-bone/10 pt-2 mt-1">
+                              <span className="text-cream-bone/50 text-xs tracking-widest uppercase font-light">Total</span>
+                              <span className="text-cream-bone font-black text-xl tracking-wide font-display">{formatARS(discountedTotal)}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span className="text-cream-bone/50 text-xs tracking-widest uppercase font-light">Total</span>
+                            <span className="text-cream-bone font-black text-xl tracking-wide font-display">{formatARS(totalAmount)}</span>
+                          </div>
+                        )}
                       </div>
 
                       <button
@@ -417,7 +491,7 @@ export default function CartDrawer() {
 
                     {/* CTA */}
                     <a
-                      href={buildPostPurchaseWhatsAppURL("Transferencia Bancaria")}
+                      href={buildPostPurchaseWhatsAppURL("Transferencia Bancaria", promoCode)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase text-center transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
