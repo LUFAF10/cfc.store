@@ -67,9 +67,28 @@ export default function CartDrawer() {
   const [promoInput, setPromoInput]   = useState("");
   const [promoStatus, setPromoStatus] = useState<"idle" | "valid" | "invalid">("idle");
 
+  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
+  const [customerErrors, setCustomerErrors] = useState({ name: false, email: false, phone: false });
+
   function handleClose() {
     closeCart();
-    setTimeout(() => { setStep("cart"); setError(null); setPromoInput(""); setPromoStatus("idle"); }, 400);
+    setTimeout(() => {
+      setStep("cart"); setError(null);
+      setPromoInput(""); setPromoStatus("idle");
+      setCustomer({ name: "", email: "", phone: "" });
+      setCustomerErrors({ name: false, email: false, phone: false });
+    }, 400);
+  }
+
+  function handleProceedToPayment() {
+    const errors = {
+      name:  customer.name.trim().length < 2,
+      email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim()),
+      phone: customer.phone.replace(/\D/g, "").length < 6,
+    };
+    setCustomerErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
+    setStep("payment");
   }
 
   function handleApplyPromo() {
@@ -91,7 +110,7 @@ export default function CartDrawer() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod: "mp", promoCode }),
+        body: JSON.stringify({ items, paymentMethod: "mp", promoCode, customer }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al conectar con Mercado Pago.");
@@ -113,7 +132,7 @@ export default function CartDrawer() {
       await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod: "transfer", promoCode }),
+        body: JSON.stringify({ items, paymentMethod: "transfer", promoCode, customer }),
       });
     } catch {
       // email failure is non-blocking
@@ -260,6 +279,43 @@ export default function CartDrawer() {
                           ))}
                         </AnimatePresence>
                       </ul>
+
+                      {/* ── Datos de contacto / envío ─────────────────────── */}
+                      <div className="mt-8 pt-8 border-t border-cream-bone/10 flex flex-col gap-4">
+                        <p className="text-cream-bone/40 text-xs tracking-widest uppercase font-light">
+                          Datos de contacto / envío
+                        </p>
+
+                        {[
+                          { key: "name",  placeholder: "Nombre completo",      type: "text",  error: customerErrors.name  },
+                          { key: "email", placeholder: "Correo electrónico",   type: "email", error: customerErrors.email },
+                          { key: "phone", placeholder: "Teléfono (WhatsApp)",  type: "tel",   error: customerErrors.phone },
+                        ].map(({ key, placeholder, type, error: fieldError }) => (
+                          <div key={key} className="flex flex-col gap-1">
+                            <input
+                              type={type}
+                              placeholder={placeholder}
+                              value={customer[key as keyof typeof customer]}
+                              onChange={(e) => {
+                                setCustomer((prev) => ({ ...prev, [key]: e.target.value }));
+                                setCustomerErrors((prev) => ({ ...prev, [key]: false }));
+                              }}
+                              className={`w-full bg-transparent border text-cream-bone text-sm font-light px-3 py-3 placeholder:text-cream-bone/25 focus:outline-none transition-colors duration-200 ${
+                                fieldError
+                                  ? "border-cream-bone/50"
+                                  : "border-cream-bone/20 focus:border-cream-bone/50"
+                              }`}
+                            />
+                            {fieldError && (
+                              <p className="text-cream-bone/40 text-[10px] tracking-wider font-light">
+                                {key === "name"  && "Ingresá tu nombre completo"}
+                                {key === "email" && "Email inválido"}
+                                {key === "phone" && "Ingresá un teléfono válido"}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
 
@@ -333,7 +389,7 @@ export default function CartDrawer() {
                       </div>
 
                       <button
-                        onClick={() => setStep("payment")}
+                        onClick={handleProceedToPayment}
                         className="w-full py-4 bg-cream-bone text-stadium-black font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
                       >
                         Finalizar Pedido

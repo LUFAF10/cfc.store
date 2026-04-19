@@ -12,9 +12,10 @@ export async function POST(req: NextRequest) {
     items: CartItem[];
     paymentMethod: "mp" | "transfer";
     promoCode?: string;
+    customer?: { name: string; email: string; phone: string };
   };
 
-  const { items, paymentMethod } = body;
+  const { items, paymentMethod, customer } = body;
 
   // Re-validate promo server-side (never trust client)
   const normalizedPromo = body.promoCode?.trim().toUpperCase() ?? null;
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   // ── Email notification (both flows) ────────────────────────────────────────
   try {
-    await sendOrderNotification(items, paymentMethod, normalizedPromo, discountPct);
+    await sendOrderNotification(items, paymentMethod, normalizedPromo, discountPct, customer);
   } catch (err) {
     console.error("[mailer] Error sending notification:", err);
   }
