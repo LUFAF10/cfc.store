@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { sendOrderNotification } from "@/lib/mailer";
-import { PROMO_CODES } from "@/context/CartContext";
+import { PROMO_CODES } from "@/lib/promoCodes";
 import type { CartItem } from "@/types/cart";
 
 // Force Node.js runtime (required for nodemailer)

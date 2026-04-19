@@ -14,11 +14,8 @@ import type { CartItem } from "@/types/cart";
 
 export type { CartItem } from "@/types/cart";
 
-// ─── Promo codes ─────────────────────────────────────────────────────────────
-
-export const PROMO_CODES: Record<string, number> = {
-  JDXCFC: 10, // 10% off
-};
+import { PROMO_CODES } from "@/lib/promoCodes";
+export { PROMO_CODES };
 
 export type PromoResult = "valid" | "invalid" | "already_applied";
 
