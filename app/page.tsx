@@ -8,48 +8,20 @@ import FeaturedProducts, { type Product } from "@/components/sections/FeaturedPr
 import FittingRoom from "@/components/FittingRoom";
 import InstagramFeed from "@/components/sections/InstagramFeed";
 
-// ─── Product catalogues per category ────────────────────────────────────────
-
-const CAMISETAS: Product[] = [
-  { team: "Arsenal",           label: "2026",           sizes: ["XL"],          file: "Arsenal 2026 XL.jpg" },
-  { team: "Arsenal",           label: "Casual",         sizes: ["XL", "XXL"],   file: "Arsenal Casual XL y XXL.jpg" },
-  { team: "Atlético Mineiro",  label: "2025",           sizes: ["XL", "XXL"],   file: "Atletico Mineiro 2025 XL y XXL.jpg" },
-  { team: "Boca",              label: "1997",           sizes: ["XL", "XXL"],   file: "Boca 1997 XL y XXL.jpg" },
-  { team: "Boca",              label: "2002",           sizes: ["XXL"],         file: "Boca 2002 XXL.jpg" },
-  { team: "Boca",              label: "2026",           sizes: ["XL", "XXL"],   file: "Boca 2026 XL y XXL_.jpg" },
-  { team: "Corinthians",       label: "2025",           sizes: ["XXL"],         file: "Corinthians 2025 XXL.jpg" },
-  { team: "Flamengo",          label: "2026",           sizes: ["XXL"],         file: "Flamengo 2026 XXL.jpg" },
-  { team: "Grêmio",            label: "2001",           sizes: ["XL"],          file: "Gremio 2001 XL.jpg" },
-  { team: "Liverpool",         label: "2025",           sizes: ["XXXL"],        file: "Liverpool 2025 XXXL.jpg" },
-  { team: "Manchester United", label: "2008",           sizes: ["XL"],          file: "Manchester United 2008 XL.jpg" },
-  { team: "Palmeiras",         label: "1997",           sizes: ["XL"],          file: "Palmeiras 1997 XL.jpg" },
-  { team: "Real Madrid",       label: "2024",           sizes: ["XL", "XXL"],   file: "Real Madrid 2024 XL y XXL.jpg" },
-  { team: "Real Madrid",       label: "2025",           sizes: ["XXL", "XXXL"], file: "Real Madrid 2025 XXL y XXXL.jpg" },
-  { team: "River",             label: "1999",           sizes: ["XL"],          file: "River 1999 XL.jpg" },
-  { team: "River",             label: "2025",           sizes: ["XL"],          file: "River 2025 XL.jpg" },
-  { team: "River",             label: "75° Aniversario",sizes: ["XL"],          file: "River 75º Aniversario XL.jpg" },
-  { team: "Santos",            label: "2011",           sizes: ["XXL"],         file: "Santos 2011 XXL.jpg" },
-];
-
-const BUZOS: Product[] = [
-  { team: "Alemania", label: "Buzo", sizes: ["XXL"], file: "Buzo Alemania XXL.jpg" },
-];
-
-const SHORTS: Product[] = [];
+// ─── Category config ─────────────────────────────────────────────────────────
 
 type CategoryKey = "CAMISETAS" | "BUZOS" | "SHORTS";
-
-const CATEGORY_DATA: Record<CategoryKey, { folder: string; products: Product[] }> = {
-  CAMISETAS: { folder: "CAMISETAS", products: CAMISETAS },
-  BUZOS:     { folder: "BUZOS",     products: BUZOS     },
-  SHORTS:    { folder: "SHORTS",    products: SHORTS    },
-};
 
 const CATEGORY_LIST: { label: string; key: CategoryKey | null }[] = [
   { label: "Camisetas", key: "CAMISETAS" },
   { label: "Buzos",     key: "BUZOS"     },
-  { label: "Shorts",    key: null        }, // folder is empty
+  { label: "Shorts",    key: null        },
 ];
+
+const EMPTY_CATALOG = {
+  CAMISETAS: [] as Product[],
+  BUZOS:     [] as Product[],
+};
 
 // ─── Shared animation config ─────────────────────────────────────────────────
 
@@ -68,6 +40,15 @@ const viewVariants = {
 export default function Home() {
   const [currentView, setCurrentView]           = useState<View>("home");
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
+  const [catalog, setCatalog]                   = useState(EMPTY_CATALOG);
+
+  // Load product catalog from API (reads image folders dynamically)
+  useEffect(() => {
+    fetch("/api/catalog")
+      .then((r) => r.json())
+      .then((data) => setCatalog({ CAMISETAS: data.CAMISETAS ?? [], BUZOS: data.BUZOS ?? [] }))
+      .catch(() => {});
+  }, []);
 
   // Detect MP payment success redirect
   useEffect(() => {
@@ -75,10 +56,15 @@ export default function Home() {
     const status = params.get("collection_status") ?? params.get("status");
     if (status === "approved") {
       setCurrentView("success");
-      // Clean up URL params without reload
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
+
+  const CATEGORY_DATA: Record<CategoryKey, { folder: string; products: Product[] }> = {
+    CAMISETAS: { folder: "CAMISETAS", products: catalog.CAMISETAS },
+    BUZOS:     { folder: "BUZOS",     products: catalog.BUZOS     },
+    SHORTS:    { folder: "SHORTS",    products: []                },
+  };
 
   function openCategory(key: CategoryKey) {
     setSelectedCategory(key);
