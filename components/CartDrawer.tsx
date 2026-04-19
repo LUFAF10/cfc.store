@@ -495,9 +495,11 @@ export default function CartDrawer() {
                       ))}
                     </div>
 
-                    <p className="text-cream-bone/35 text-xs font-light mt-8 leading-relaxed">
-                      Una vez realizada la transferencia, envianos el comprobante por WhatsApp y confirmamos tu pedido.
-                    </p>
+                    <div className="mt-8 pt-6 border-t border-cream-bone/10">
+                      <p className="text-cream-bone/80 text-sm italic font-light leading-relaxed my-4">
+                        Por favor, copiá los datos de la cuenta para realizar la transferencia. Una vez hecha, es <span className="not-italic font-semibold">REQUISITO OBLIGATORIO</span> hacer clic en el botón &ldquo;Confirmar y enviar comprobante&rdquo; para enviarnos el comprobante por WhatsApp. Sin este paso, no podremos procesar el pedido ni coordinar la entrega de tu prenda.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="px-5 sm:px-8 py-6 border-t border-cream-bone/10 shrink-0">
