@@ -15,7 +15,7 @@ type CategoryKey = "CAMISETAS" | "BUZOS" | "SHORTS";
 const CATEGORY_LIST: { label: string; key: CategoryKey | null }[] = [
   { label: "Camisetas", key: "CAMISETAS" },
   { label: "Buzos",     key: "BUZOS"     },
-  { label: "Shorts",    key: null        },
+  { label: "Shorts",    key: "SHORTS"    },
 ];
 
 const EMPTY_CATALOG = {
