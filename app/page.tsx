@@ -21,6 +21,7 @@ const CATEGORY_LIST: { label: string; key: CategoryKey | null }[] = [
 const EMPTY_CATALOG = {
   CAMISETAS: [] as Product[],
   BUZOS:     [] as Product[],
+  SHORTS:    [] as Product[],
 };
 
 // ─── Shared animation config ─────────────────────────────────────────────────
@@ -46,7 +47,7 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/catalog")
       .then((r) => r.json())
-      .then((data) => setCatalog({ CAMISETAS: data.CAMISETAS ?? [], BUZOS: data.BUZOS ?? [] }))
+      .then((data) => setCatalog({ CAMISETAS: data.CAMISETAS ?? [], BUZOS: data.BUZOS ?? [], SHORTS: data.SHORTS ?? [] }))
       .catch(() => {});
   }, []);
 
@@ -63,7 +64,7 @@ export default function Home() {
   const CATEGORY_DATA: Record<CategoryKey, { folder: string; products: Product[] }> = {
     CAMISETAS: { folder: "CAMISETAS", products: catalog.CAMISETAS },
     BUZOS:     { folder: "BUZOS",     products: catalog.BUZOS     },
-    SHORTS:    { folder: "SHORTS",    products: []                },
+    SHORTS:    { folder: "SHORTS",    products: catalog.SHORTS    },
   };
 
   function openCategory(key: CategoryKey) {
@@ -90,8 +91,10 @@ export default function Home() {
             className="bg-stadium-black"
           >
             {/* ── Hero ── */}
-            <div className="flex flex-col items-center min-h-screen px-4 sm:px-6 text-center pt-36 sm:pt-48 pb-24">
-              <div className="max-w-3xl mx-auto flex flex-col items-center">
+            <div className="relative flex flex-col items-center min-h-screen px-4 sm:px-6 text-center pt-36 sm:pt-48 pb-24 bg-[url('/images/hero-bg.jpg')] bg-cover bg-center">
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black pointer-events-none" />
+              <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
 
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}

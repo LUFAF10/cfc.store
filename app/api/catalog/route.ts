@@ -22,15 +22,31 @@ function parseFilename(filename: string): Product | null {
   const name = filename
     .replace(IMAGE_EXTS, "")
     .replace(/[_]+$/, "")
+    .replace(/,/g, " ")   // normalize "L,XL y XXL" → "L XL y XXL"
     .trim();
 
-  const tokens = name.split(/\s+/);
+  // Split and handle "XLy" / "XXLy" (size glued to "y" with no space)
+  const rawTokens = name.split(/\s+/);
+  const tokens: string[] = [];
+  for (const t of rawTokens) {
+    const upper = t.toUpperCase();
+    let split = false;
+    for (const size of ["XXXL", "XXL", "XL", "XS", "S", "M", "L"]) {
+      if (upper === size + "Y") {
+        tokens.push(size, "y");
+        split = true;
+        break;
+      }
+    }
+    if (!split) tokens.push(t);
+  }
+
   const sizes: string[] = [];
   let end = tokens.length;
 
   // Scan right-to-left: collect sizes and "y" connectors
   for (let i = tokens.length - 1; i >= 0; i--) {
-    const t = tokens[i].replace(/[_]+$/, "").toUpperCase();
+    const t = tokens[i].replace(/[_,]+$/, "").toUpperCase();
     if (SIZE_TOKENS.has(t)) {
       sizes.unshift(t);
       end = i;
@@ -73,10 +89,11 @@ async function readCategory(folder: string): Promise<Product[]> {
 // ─── Route ───────────────────────────────────────────────────────────────────
 
 export async function GET() {
-  const [camisetas, buzos] = await Promise.all([
+  const [camisetas, buzos, shorts] = await Promise.all([
     readCategory("CAMISETAS"),
     readCategory("BUZOS"),
+    readCategory("SHORTS"),
   ]);
 
-  return NextResponse.json({ CAMISETAS: camisetas, BUZOS: buzos });
+  return NextResponse.json({ CAMISETAS: camisetas, BUZOS: buzos, SHORTS: shorts });
 }
