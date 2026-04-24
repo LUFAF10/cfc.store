@@ -19,8 +19,30 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Club Futbol Collection",
-  description: "Encuentra las joyas retro que definieron la historia del fútbol mundial.",
+  title: "Club Fútbol Collection — Camisetas Retro Originales",
+  description: "Encontrá las mejores camisetas retro del fútbol mundial. Piezas únicas, stock limitado. Pagá con Mercado Pago o transferencia. Envíos a todo el país.",
+  openGraph: {
+    title: "Club Fútbol Collection — Camisetas Retro Originales",
+    description: "Encontrá las mejores camisetas retro del fútbol mundial. Piezas únicas, stock limitado.",
+    url: "https://cfc-store-rgp2.vercel.app",
+    siteName: "Club Fútbol Collection",
+    images: [
+      {
+        url: "https://cfc-store-rgp2.vercel.app/images/logo-transparente.png",
+        width: 800,
+        height: 800,
+        alt: "Club Fútbol Collection",
+      },
+    ],
+    locale: "es_AR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Club Fútbol Collection — Camisetas Retro Originales",
+    description: "Encontrá las mejores camisetas retro del fútbol mundial. Piezas únicas, stock limitado.",
+    images: ["https://cfc-store-rgp2.vercel.app/images/logo-transparente.png"],
+  },
 };
 
 export default function RootLayout({
