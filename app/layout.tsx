@@ -28,9 +28,9 @@ export const metadata: Metadata = {
     siteName: "Club Fútbol Collection",
     images: [
       {
-        url: "https://cfc-store-rgp2.vercel.app/images/logo-transparente.png",
-        width: 800,
-        height: 800,
+        url: "https://cfc-store-rgp2.vercel.app/images/og-image.png",
+        width: 1080,
+        height: 1080,
         alt: "Club Fútbol Collection",
       },
     ],
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Club Fútbol Collection — Camisetas Retro Originales",
     description: "Encontrá las mejores camisetas retro del fútbol mundial. Piezas únicas, stock limitado.",
-    images: ["https://cfc-store-rgp2.vercel.app/images/logo-transparente.png"],
+    images: ["https://cfc-store-rgp2.vercel.app/images/og-image.png"],
   },
 };
 
