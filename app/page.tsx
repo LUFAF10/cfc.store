@@ -91,7 +91,7 @@ export default function Home() {
             className="bg-stadium-black"
           >
             {/* ── Hero ── */}
-            <div className="relative flex flex-col items-center min-h-screen px-4 sm:px-6 text-center pt-36 sm:pt-48 pb-24 bg-[url('/images/hero-bg.jpeg')] bg-cover bg-center">
+            <div className="relative flex flex-col items-center min-h-screen px-4 sm:px-6 text-center pt-36 sm:pt-48 pb-24 bg-[url('/images/hero-bg.avif')] bg-cover bg-center">
               {/* Dark overlay */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black pointer-events-none" />
               <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
