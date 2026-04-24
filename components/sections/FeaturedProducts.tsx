@@ -161,7 +161,7 @@ function ProductCard({
                 return (
                   <button
                     key={size}
-                    onClick={() => { if (!sold) { setSelectedSize(size); setError(false); } }}
+                    onClick={() => { if (!sold) { setSelectedSize(prev => prev === size ? null : size); setError(false); } }}
                     disabled={sold}
                     className={`relative min-h-[44px] px-3 py-2 text-xs tracking-widest uppercase font-light border transition-all duration-200 ${
                       sold
