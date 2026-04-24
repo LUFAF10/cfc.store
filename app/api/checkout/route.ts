@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { sendOrderNotification } from "@/lib/mailer";
 import { PROMO_CODES } from "@/lib/promoCodes";
+import { markSold } from "@/lib/stock";
 import type { CartItem } from "@/types/cart";
 
 // Force Node.js runtime (required for nodemailer)
@@ -31,6 +32,13 @@ export async function POST(req: NextRequest) {
     await sendOrderNotification(items, paymentMethod, normalizedPromo, discountPct, customer);
   } catch (err) {
     console.error("[mailer] Error sending notification:", err);
+  }
+
+  // ── Mark sold sizes ─────────────────────────────────────────────────────────
+  try {
+    await Promise.all(items.map((i) => markSold(i.team, i.label, i.size)));
+  } catch (err) {
+    console.error("[stock] Error marking sold:", err);
   }
 
   // ── Mercado Pago flow ───────────────────────────────────────────────────────

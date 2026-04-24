@@ -42,12 +42,21 @@ export default function Home() {
   const [currentView, setCurrentView]           = useState<View>("home");
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
   const [catalog, setCatalog]                   = useState(EMPTY_CATALOG);
+  const [soldSet, setSoldSet]                   = useState<Set<string>>(new Set());
 
   // Load product catalog from API (reads image folders dynamically)
   useEffect(() => {
     fetch("/api/catalog")
       .then((r) => r.json())
       .then((data) => setCatalog({ CAMISETAS: data.CAMISETAS ?? [], BUZOS: data.BUZOS ?? [], SHORTS: data.SHORTS ?? [] }))
+      .catch(() => {});
+  }, []);
+
+  // Load sold sizes from stock API
+  useEffect(() => {
+    fetch("/api/stock")
+      .then((r) => r.json())
+      .then((data) => setSoldSet(new Set(data.sold ?? [])))
       .catch(() => {});
   }, []);
 
@@ -232,6 +241,7 @@ export default function Home() {
               title={selectedCategory ?? ""}
               folder={activeCategoryData.folder}
               products={activeCategoryData.products}
+              soldSet={soldSet}
               onBack={() => setCurrentView("categories")}
               onFittingRoom={() => setCurrentView("fitting")}
             />

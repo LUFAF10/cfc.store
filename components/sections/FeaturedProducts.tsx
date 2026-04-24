@@ -19,6 +19,7 @@ interface FeaturedProductsProps {
   title: string;
   folder: string;
   products: Product[];
+  soldSet: Set<string>;
   onBack: () => void;
   onFittingRoom: () => void;
 }
@@ -44,10 +45,12 @@ const cardVariants = {
 function ProductCard({
   product,
   folder,
+  soldSet,
   onFittingRoom,
 }: {
   product: Product;
   folder: string;
+  soldSet: Set<string>;
   onFittingRoom: () => void;
 }) {
   const { addItem, openCart, items } = useCart();
@@ -55,6 +58,10 @@ function ProductCard({
   const [error, setError] = useState(false);
 
   const price = getPriceForFolder(folder);
+
+  function isSold(size: string) {
+    return soldSet.has(`${product.team}__${product.label}__${size}`);
+  }
 
   // Reset selection when the item is removed from the cart
   const itemId = selectedSize ? `${product.team}__${product.label}__${selectedSize}` : null;
@@ -149,19 +156,25 @@ function ProductCard({
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => { setSelectedSize(size); setError(false); }}
-                  className={`min-h-[44px] px-3 py-2 text-xs tracking-widest uppercase font-light border transition-all duration-200 ${
-                    selectedSize === size
-                      ? "bg-cream-bone text-stadium-black border-cream-bone font-bold"
-                      : "border-cream-bone/25 text-cream-bone/55 hover:border-cream-bone/60 hover:text-cream-bone/80"
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+              {product.sizes.map((size) => {
+                const sold = isSold(size);
+                return (
+                  <button
+                    key={size}
+                    onClick={() => { if (!sold) { setSelectedSize(size); setError(false); } }}
+                    disabled={sold}
+                    className={`relative min-h-[44px] px-3 py-2 text-xs tracking-widest uppercase font-light border transition-all duration-200 ${
+                      sold
+                        ? "border-cream-bone/10 text-cream-bone/20 cursor-not-allowed line-through"
+                        : selectedSize === size
+                          ? "bg-cream-bone text-stadium-black border-cream-bone font-bold"
+                          : "border-cream-bone/25 text-cream-bone/55 hover:border-cream-bone/60 hover:text-cream-bone/80"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -191,7 +204,7 @@ function ProductCard({
 
 // ─── Section ──────────────────────────────────────────────────────────────────
 
-export default function FeaturedProducts({ title, folder, products, onBack, onFittingRoom }: FeaturedProductsProps) {
+export default function FeaturedProducts({ title, folder, products, soldSet, onBack, onFittingRoom }: FeaturedProductsProps) {
   return (
     <section className="bg-stadium-black min-h-screen pt-28 pb-20 px-4 md:pt-32 md:pb-24 md:px-6">
       <div className="max-w-7xl mx-auto">
@@ -256,7 +269,7 @@ export default function FeaturedProducts({ title, folder, products, onBack, onFi
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
         >
           {products.map((product) => (
-            <ProductCard key={product.file} product={product} folder={folder} onFittingRoom={onFittingRoom} />
+            <ProductCard key={product.file} product={product} folder={folder} soldSet={soldSet} onFittingRoom={onFittingRoom} />
           ))}
         </motion.div>
 
